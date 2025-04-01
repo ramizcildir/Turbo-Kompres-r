@@ -1,0 +1,33 @@
+import matplotlib.pyplot as plt
+import numpy as np
+# Örnek veriler (RPM değerlerine göre hacimsel akış ve basınç oranı)
+rpm_values = [1000, 2000, 3000, 4000, 5000, 6000, 7000]
+volume_flows = [0.05, 0.1, 0.15, 0.2, 0.22, 0.25, 0.28]  # m³/s
+pressure_ratios = [1.2, 1.4, 1.6, 1.8, 2.0, 2.5, 2.8]  # P2/P1
+
+np.random.seed(30)
+efficiency_curves = [
+    (volume_flows, [p * (1 + np.random.uniform(-0.05, 0.05)) for p in pressure_ratios], color)
+    for color in ['green', 'blue', 'crimson', 'grey']
+]
+
+# Grafik çizimi
+plt.figure(figsize=(8,6))
+
+# Verimlilik eğrilerini çiz
+for vol, pres, col in efficiency_curves:
+    plt.plot(vol, pres, linestyle="--", marker="1", color=col, label="Efficiency Curve")
+
+# Önemli RPM noktalarını işaretle
+for i, rpm in enumerate(rpm_values):
+    plt.scatter(volume_flows[i], pressure_ratios[i], color="black", marker="x")
+    plt.text(volume_flows[i], pressure_ratios[i], f"{rpm} RPM", fontsize=10, ha="left", va="bottom")
+# Eksenler ve başlık
+plt.xlabel("Volume Flow [m³/s]")
+plt.ylabel("Pressure Ratio [P2/P1]")
+plt.title("Kompresör Haritası - Mercedes AMG A 45 2.0L Turbo")
+plt.legend()
+plt.grid(True, linestyle="--", alpha=0.5)
+
+# Grafiği göster
+plt.show()
