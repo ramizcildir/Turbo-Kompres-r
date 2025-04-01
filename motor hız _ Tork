@@ -1,0 +1,30 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Araç hızını (km/h) tanımlayalım (Örnek değerler)
+hiz = np.linspace(0, 200, 100)  # 0 km/h ile 200 km/h arasında 100 nokta
+
+# Örnek bir tork eğrisi (Gerçek verilere uygun hale getirilebilir)
+tork = 250 * np.exp(-((hiz - 100) ** 2) / (2 * 40**2)) + 50  # Gaussian fonksiyonu ile oluşturulmuş bir eğri
+
+# Grafik çizimi
+plt.figure(figsize=(10, 6))
+plt.plot(hiz, tork, label="Motor Tork Eğrisi", color='b', linewidth=2)
+
+# Maksimum tork noktasını belirleyelim ve işaretleyelim
+max_tork_index = np.argmax(tork)
+plt.scatter(hiz[max_tork_index], tork[max_tork_index], color='r', s=100, label="Maksimum Tork")
+
+# Grafik başlık ve etiketleri
+plt.title("Motor Hız - Tork Eğrisi", fontsize=16)
+plt.xlabel("Araç Hızı (km/h)", fontsize=14)
+plt.ylabel("Tork (Nm)", fontsize=14)
+
+# Grid ve gösterge ayarları
+plt.legend(fontsize=12)
+plt.grid(True, linestyle="--", alpha=0.7)
+plt.xticks(fontsize=12)
+plt.yticks(fontsize=12)
+
+# Grafik gösterimi
+plt.show()
