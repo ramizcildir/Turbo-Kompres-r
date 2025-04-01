@@ -1,0 +1,30 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Motor devri (RPM) aralığını tanımlayalım
+rpm = np.linspace(1000, 7000, 100)  # 1000 RPM ile 7000 RPM arasında 100 nokta
+
+# Motor tork eğrisini (Nm) modelleyelim (Örnek bir tork eğrisi)
+tork = 200 * np.exp(-((rpm - 4000) ** 2) / (2 * 1000**2)) + 100  # Gaussian fonksiyonuyla oluşturulmuş örnek tork eğrisi
+
+# Grafik ayarları
+plt.figure(figsize=(10, 6))
+plt.plot(rpm, tork, label='Motor Tork Eğrisi', color='b', linewidth=2)
+
+# Grafik başlık ve etiketleri
+plt.title("Motor Devri - Tork Eğrisi", fontsize=16)
+plt.xlabel("Motor Devri (RPM)", fontsize=14)
+plt.ylabel("Tork (Nm)", fontsize=14)
+
+# Önemli noktaları göster (Max Tork noktası)
+max_tork_index = np.argmax(tork)
+plt.scatter(rpm[max_tork_index], tork[max_tork_index], color='r', s=100, label="Maksimum Tork")
+
+# Grid ve gösterge ayarları
+plt.legend(fontsize=12)
+plt.grid(True, linestyle="--", alpha=0.7)
+plt.xticks(fontsize=12)
+plt.yticks(fontsize=12)
+
+# Grafik gösterimi
+plt.show()
