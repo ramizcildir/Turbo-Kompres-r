@@ -1,0 +1,40 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
+# --- Kompresör Haritası Verileri (Temsili) ---
+volume_flow = np.linspace(0.05, 0.30, 7)  # [m³/s]
+pressure_ratio = [1.2, 1.5, 1.8, 2.1, 2.4, 2.6, 2.75]  # Basınç oranı P2/P1
+
+# --- Tork Eğrisi Verileri (Gerçekçi, Normalize edilmemiş) ---
+rpm = [1000, 2000, 3000, 4000, 5000, 6000, 7000]
+torque = [180, 350, 450, 500, 500, 460, 400]  # [Nm]
+
+# Tork için yaklaşık hacimsel debi karşılıkları (aynı x ekseni için)
+volume_flow_torque = np.interp(rpm, [1000, 7000], [0.05, 0.30])
+
+# --- Grafik Çizimi ---
+fig, ax1 = plt.subplots(figsize=(10, 6))
+
+# Kompresör Haritası (Sol Y Ekseni)
+ax1.plot(volume_flow, pressure_ratio, 'o-', color='orangered', linewidth=2.5, label='Compressor Curve')
+ax1.set_xlabel('Volume Flow [m³/s]')
+ax1.set_ylabel('Pressure Ratio [P2/P1]', color='orangered')
+ax1.tick_params(axis='y', labelcolor='orangered')
+ax1.grid(True)
+
+# Tork Eğrisi (Sağ Y Ekseni)
+ax2 = ax1.twinx()
+ax2.plot(volume_flow_torque, torque, 's-', color='royalblue', linewidth=2.5, label='Torque Curve')
+ax2.set_ylabel('Torque [Nm]', color='royalblue')
+ax2.tick_params(axis='y', labelcolor='royalblue')
+
+# Etiketler
+for x, y, r in zip(volume_flow_torque, torque, rpm):
+    ax2.text(x, y + 15, f'{r} RPM', ha='center', fontsize=8, color='blue')
+
+# Başlık ve Legend
+fig.suptitle('Kompresör + Tork Eğrisi - Mercedes AMG A 45 2.0L Turbo', fontsize=14, fontweight='bold')
+fig.legend(loc='upper left', bbox_to_anchor=(0.1, 0.9))
+
+plt.tight_layout()
+plt.show()
