@@ -1,0 +1,118 @@
+import pygame
+import sys
+
+pygame.init()
+
+# Renkler
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+BLUE = (50, 150, 255)
+GREEN = (0, 200, 0)
+RED = (200, 0, 0)
+GRAY = (180, 180, 180)
+
+WIDTH, HEIGHT = 1000, 600
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Common Rail Dizel Sistem Simülasyonu")
+
+font = pygame.font.SysFont("arial", 18)
+
+components = {
+    "depo": pygame.Rect(50, 250, 60, 100),
+    "pompa": pygame.Rect(150, 260, 60, 40),
+    "filtre": pygame.Rect(250, 260, 60, 40),
+    "yüksek_basınç_pompası": pygame.Rect(350, 260, 60, 40),
+    "common_rail": pygame.Rect(450, 230, 200, 20),
+    "enjektörler": [
+        pygame.Rect(470, 270, 20, 50),
+        pygame.Rect(510, 270, 20, 50),
+        pygame.Rect(550, 270, 20, 50),
+        pygame.Rect(590, 270, 20, 50)
+    ],
+    "silindirler": [
+        pygame.Rect(470, 330, 20, 60),
+        pygame.Rect(510, 330, 20, 60),
+        pygame.Rect(550, 330, 20, 60),
+        pygame.Rect(590, 330, 20, 60)
+    ]
+}
+
+particle_pos = [components["depo"].right, components["depo"].centery]
+particle_speed = 2
+stage = 0
+enjektör_index = 0
+
+clock = pygame.time.Clock()
+running = True
+
+while running:
+    screen.fill(WHITE)
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+    # Bileşenleri çiz
+    pygame.draw.rect(screen, GRAY, components["depo"])
+    screen.blit(font.render("Depo", True, BLACK), (components["depo"].x, components["depo"].y - 20))
+    pygame.draw.rect(screen, BLUE, components["pompa"])
+    screen.blit(font.render("Pompa", True, BLACK), (components["pompa"].x, components["pompa"].y - 20))
+    pygame.draw.rect(screen, BLUE, components["filtre"])
+    screen.blit(font.render("Filtre", True, BLACK), (components["filtre"].x, components["filtre"].y - 20))
+    pygame.draw.rect(screen, RED, components["yüksek_basınç_pompası"])
+    screen.blit(font.render("Yüksek Basınçlı Pompa", True, BLACK), (components["yüksek_basınç_pompası"].x - 30, components["yüksek_basınç_pompası"].y - 20))
+    pygame.draw.rect(screen, BLACK, components["common_rail"])
+    screen.blit(font.render("Common Rail", True, BLACK), (components["common_rail"].x, components["common_rail"].y - 20))
+
+    for i, enjektör in enumerate(components["enjektörler"]):
+        pygame.draw.rect(screen, GREEN, enjektör)
+        screen.blit(font.render(f"E{i+1}", True, BLACK), (enjektör.x, enjektör.y - 20))
+
+    for i, silindir in enumerate(components["silindirler"]):
+        pygame.draw.rect(screen, GRAY, silindir)
+        screen.blit(font.render(f"Sil{i+1}", True, BLACK), (silindir.x - 5, silindir.y + 65))
+
+    # Parçacık animasyonu
+    pygame.draw.circle(screen, BLUE, particle_pos, 6)
+
+    if stage == 0:
+        if particle_pos[0] < components["pompa"].centerx:
+            particle_pos[0] += particle_speed
+        else:
+            stage = 1
+    elif stage == 1:
+        if particle_pos[0] < components["filtre"].centerx:
+            particle_pos[0] += particle_speed
+        else:
+            stage = 2
+    elif stage == 2:
+        if particle_pos[0] < components["yüksek_basınç_pompası"].centerx:
+            particle_pos[0] += particle_speed
+        else:
+            stage = 3
+    elif stage == 3:
+        if particle_pos[0] < components["common_rail"].x + components["common_rail"].width // 2:
+            particle_pos[0] += particle_speed
+            particle_pos[1] -= 1
+        else:
+            stage = 4
+            enjektör_index = 0
+            particle_pos = [components["common_rail"].x + 20 * enjektör_index + 20, components["common_rail"].y + 10]
+    elif stage == 4:
+        if enjektör_index < len(components["enjektörler"]):
+            silindir = components["silindirler"][enjektör_index]
+            if particle_pos[1] < silindir.centery:
+                particle_pos[1] += particle_speed
+            else:
+                enjektör_index += 1
+                if enjektör_index < len(components["enjektörler"]):
+                    particle_pos = [components["common_rail"].x + 20 * enjektör_index + 20, components["common_rail"].y + 10]
+                else:
+                    stage = 0
+                    particle_pos = [components["depo"].right, components["depo"].centery]
+
+    pygame.display.flip()
+    clock.tick(60)
+
+pygame.quit()
+sys.exit()
