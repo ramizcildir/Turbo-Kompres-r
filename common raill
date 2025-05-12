@@ -1,0 +1,66 @@
+function common_rail_simulation()
+    % Grafik penceresi
+    figure('Name', 'Common Rail Dizel Sistem Simülasyonu', 'NumberTitle', 'off');
+    axis([0 100 0 100]);
+    axis equal
+    hold on
+    grid on
+
+    % Bileşen yerleri
+    positions = struct( ...
+        'depo', [10 50], ...
+        'pompa', [20 50], ...
+        'filtre', [30 50], ...
+        'yüksek_pompa', [40 50], ...
+        'rail', [50 60], ...
+        'enjektörler', [55 45; 60 45; 65 45; 70 45], ...
+        'silindirler', [55 35; 60 35; 65 35; 70 35] ...
+    );
+
+    % Bileşenleri çiz
+    draw_box(positions.depo, 'Depo');
+    draw_box(positions.pompa, 'Pompa');
+    draw_box(positions.filtre, 'Filtre');
+    draw_box(positions.yüksek_pompa, 'Yüksek Pompa');
+    rectangle('Position',[positions.rail 20 5],'FaceColor',[0 0 0])
+    text(positions.rail(1)+5, positions.rail(2)+6, 'Common Rail');
+
+    for i = 1:4
+        draw_box(positions.enjektörler(i,:), ['E' num2str(i)]);
+        draw_box(positions.silindirler(i,:), ['Sil' num2str(i)]);
+    end
+
+    % Yakıt parçacığı (animasyon)
+    particle = plot(positions.depo(1), positions.depo(2), 'bo', 'MarkerSize', 8, 'MarkerFaceColor', 'b');
+
+    % Adımlar
+    route = [
+        positions.pompa;
+        positions.filtre;
+        positions.yüksek_pompa;
+        positions.rail + [10 5];
+        positions.enjektörler;
+        positions.silindirler
+    ];
+
+    % Animasyonu döngüyle çalıştır
+    while ishandle(particle)
+        pos = positions.depo;
+        for i = 1:size(route,1)
+            target = route(i,:);
+            while norm(pos - target) > 0.5
+                pos = pos + 0.5 * (target - pos) / norm(target - pos);
+                set(particle, 'XData', pos(1), 'YData', pos(2));
+                pause(0.01);
+            end
+            pause(0.1);
+        end
+    end
+end
+
+function draw_box(center, label)
+    w = 6; h = 6;
+    rectangle('Position', [center(1)-w/2, center(2)-h/2, w, h], ...
+              'FaceColor', [0.8 0.8 0.8], 'EdgeColor', 'k');
+    text(center(1)-2, center(2)+5, label);
+end
